@@ -1,63 +1,74 @@
 import socket
 import tkinter as tk
 import tkinter.messagebox as box
+import threading
+
+SERVER_HOST = 'localhost'  
+SERVER_PORT = 12345
+
+id_list=["00000","00000","00000","00000","00000","00000","00000",]
+text_list=["-----","-----","-----","-----","-----","-----","-----",]
 
 
-def Main():
-    host = "localhost"
-    port = 5000
+def update_gui():
+    for i in range(7):
+        id_list_label[i].config(text=id_list[i])
+        text_list_label[i].config(text=text_list[i])
+        
 
-    print (socket.gethostname())
+def start_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((SERVER_HOST, SERVER_PORT))
+    server_socket.listen(1)
+    print(f"[*] Listening on {SERVER_HOST}:{SERVER_PORT}")
 
-    mySocket = socket.socket()
-    mySocket.bind((host,port))
+    client_socket, client_address = server_socket.accept()
+    print(f"[*] Accepted connection from {client_address[0]}:{client_address[1]}")
+    client_socket.sendall("Hello, client!".encode())
 
-    mySocket.listen(1)
-    conn, addr = mySocket.accept()
-    print ("Connection from: " + str(addr))
     while True:
-        data = conn.recv(1024).decode()
+        data = client_socket.recv(1024)
         if not data:
             break
+        print(f"[*] Received: {data.decode()}")
+        decoded_data=data.decode()
+        number_id, message = decoded_data.split(':')
+        del id_list[0]
+        del text_list[0]
+        id_list.append(number_id)
+        text_list.append(message)
+        update_gui()
+        
+        
+def start_gui():
+    window = tk.Tk()
+    window.title("당신을 원하고 있습니다!!")
+    window.geometry("1000x300+300+100")
 
-        data = str(data)
-        print (data)
+    id_label=tk.Label(window, text="아이디", borderwidth=3, relief="groove", width=30, height=2, padx=10, bg="gray")
+    id_label.grid(row=0, column=0, sticky="nsew")
 
-    conn.close()
+    text_label=tk.Label(window, text="내용", borderwidth=3, relief="groove", width=105, height=2, padx=10, bg="gray")
+    text_label.grid(row=0, column=1, sticky="nsew")
 
-def add_waiting():
-    print(123)
+    global id_list_label, text_list_label
 
-if __name__ == '__main__':
-    Main()
+    id_list_label = []
+    text_list_label = []
+
+    for i in [0,1,2,3,4,5,6]:
+        id_list_label.append(tk.Label(window, text=id_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10))
+        id_list_label[i].grid(row=i+1, column=0, sticky="nsew")
+        text_list_label.append(tk.Label(window, text=text_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10))
+        text_list_label[i].grid(row=i+1, column=1, sticky="nsew")
+
+    window.mainloop()
 
 
-waiting_list={
-    "30913":"안녕하세요",
-    "12345":"ㅠㅠㅠㅠ",
-    "11111":"-----",
-    "22222":"-----",
-    "33333":"-----",
-    "44444":"444444",
-    "55555":"555555",
-}
-id_list=list(waiting_list.keys())
-text_list=list(waiting_list.values())
 
-window = tk.Tk()
-window.title("당신을 원하고 있습니다!!")
-window.geometry("1000x300+300+100")
 
-id_label=tk.Label(window, text="아이디", borderwidth=3, relief="groove", width=30, height=2, padx=10, bg="gray")
-id_label.grid(row=0, column=0, sticky="nsew")
+server_thread = threading.Thread(target=start_server)
+gui_thread = threading.Thread(target=start_gui)
 
-text_label=tk.Label(window, text="내용", borderwidth=3, relief="groove", width=105, height=2, padx=10, bg="gray")
-text_label.grid(row=0, column=1, sticky="nsew")
-
-for i in [0,1,2,3,4,5,6]:
-    id_list_label=tk.Label(window, text=id_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10)
-    id_list_label.grid(row=i+1, column=0, sticky="nsew")
-    text_list_label=tk.Label(window, text=text_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10)
-    text_list_label.grid(row=i+1, column=1, sticky="nsew")
-
-window.mainloop()
+server_thread.start()
+gui_thread.start()

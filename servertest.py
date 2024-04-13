@@ -1,7 +1,7 @@
 import socket
 
 # 서버 주소와 포트
-SERVER_HOST = '0.0.0.0'  # 외부에서 접근 가능한 모든 네트워크 인터페이스에 바인딩
+SERVER_HOST = 'localhost'  # 외부에서 접근 가능한 모든 네트워크 인터페이스에 바인딩
 SERVER_PORT = 12345
 
 # 소켓 생성

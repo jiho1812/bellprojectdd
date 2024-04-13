@@ -3,50 +3,48 @@ import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
 
-mySocket = socket.socket()
+SERVER_HOST = 'localhost'
+SERVER_PORT = 12345
 
-def Main():
-        host = "DESKTOP-2NOGS03"
-        port = 5000
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((SERVER_HOST, SERVER_PORT))
 
-        
-        mySocket.connect((host,port))
-
-        message = input(" -> ")
-
-        while message != 'q':
-                mySocket.send(message.encode())
-                data = mySocket.recv(1024).decode()
-
-                print ('Received from server: ' + data)
-
-                message = input(" -> ")
-
-        mySocket.close()
-
-if __name__ == '__main__':
-    Main()
-
+server_msg = client_socket.recv(1024)
+print(f"[*] Received from server: {server_msg.decode()}")
 
 
 id_and_password={
-    "id":"password",
-    "30913" : "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
-    "30826" : "fe2592b42a727e977f055947385b709cc82b16b9a87f88c6abf3900d65d0cdc3",
+
 }
 
+with open(r'C:\Coding\bellproject\databa\회원정보.txt', 'r') as file:
+    # 파일의 각 줄에 대해서 반복
+        for line in file:
+            # 줄을 콜론(:)을 기준으로 분리하여 key와 value로 저장
+            key, value = line.strip().split(":")
+            
+            # 딕셔너리에 key와 value 추가
+            id_and_password[key] = value
 
-def check(id_entry, password_entry, text, mySocket):
+
+
+def check(id_entry, password_entry, text, client_socket):
     id_value=id_entry.get()
     password_value=password_entry.get()
-    text_value = text.get("1.0", tk.END)
+    text_value = text.get()
     if id_value not in id_and_password.keys():
         print("존재하지 않는 학번입니다.")
         box.showinfo(message="존재하지 않는 학번입니다.", title="경고")
     else:
         if  hashlib.sha256(password_value.encode()).hexdigest() == id_and_password[id_value] :
             print(text_value)
-            mySocket.send(text_value.encode())
+            text_id=f"{id_value}:{text_value}"
+            client_socket.send(text_id.encode())
+            box.showinfo(message="전송되었습니다.", title="알림")
+            id_entry.delete(0, len(id_entry.get()))
+            password_entry.delete(0, len(password_entry.get()))
+            text.delete(0, len(text.get()))
+
         else:
             box.showinfo(message="아이디와 비밀번호가 일치하지 않습니다.", title="경고")
 
@@ -54,12 +52,32 @@ def check(id_entry, password_entry, text, mySocket):
 def register_check(admin_password_entry,register_id_entry,register_password_entry):
     admin_pw = "12345"
     password_value=register_password_entry.get()
-    if admin_pw ==  admin_password_entry.get():
-        id_and_password[register_id_entry.get()]=hashlib.sha256(password_value.encode()).hexdigest()
-        box.showinfo(message="회원가입이 완료되었습니다.", title="알림")
-    else: 
-        box.showinfo(message="관리자 비밀번호가 일치하지 않습니다.", title="경고")
-        
+    if register_id_entry.get() not in id_and_password:
+        if admin_pw ==  admin_password_entry.get():
+            hashed_password = hashlib.sha256(password_value.encode()).hexdigest()
+            id_and_password[register_id_entry.get()] = hashed_password
+
+
+            box.showinfo(message="회원가입이 완료되었습니다.", title="알림")
+
+            output_file_path = r'C:\Coding\bellproject\databa\회원정보.txt'
+            with open(output_file_path, 'a', encoding='utf-8') as output_file:
+                output_file.write(f"{register_id_entry.get()}:{hashed_password}\n")
+           
+           
+
+            register_id_entry.delete(0, len(register_id_entry.get()))
+            register_password_entry.delete(0, len(register_password_entry.get()))
+            admin_password_entry.delete(0, len(admin_password_entry.get()))
+        else: 
+            box.showinfo(message="관리자 비밀번호가 일치하지 않습니다.", title="경고")
+            register_id_entry.delete(0, len(register_id_entry.get()))
+            register_password_entry.delete(0, len(register_password_entry.get()))
+            admin_password_entry.delete(0, len(admin_password_entry.get()))
+            
+    else:
+     box.showinfo(message="이미 등록된 학번입니다.", title="경고")
+
 
 def show_page(page):
     page.tkraise()
@@ -79,13 +97,13 @@ def create_page1(container):
     password_entry=tk.Entry(page1, show="*")
     password_entry.pack()
 
-    text_label=tk.Label(page1, text="요구사항")
+    text_label=tk.Label(page1, text="요구사항(한 줄로 입력해주세요.)")
     text_label.pack()
 
-    text=tk.Text(page1)
+    text=tk.Entry(page1)
     text.pack()
 
-    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text, mySocket))
+    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text, client_socket))
     button.pack()
 
     button1 = tk.Button(page1, text="회원가입", command=lambda: show_page(page2))
