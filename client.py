@@ -1,6 +1,33 @@
+import socket
 import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
+
+mySocket = socket.socket()
+
+def Main():
+        host = "DESKTOP-2NOGS03"
+        port = 5000
+
+        
+        mySocket.connect((host,port))
+
+        message = input(" -> ")
+
+        while message != 'q':
+                mySocket.send(message.encode())
+                data = mySocket.recv(1024).decode()
+
+                print ('Received from server: ' + data)
+
+                message = input(" -> ")
+
+        mySocket.close()
+
+if __name__ == '__main__':
+    Main()
+
+
 
 id_and_password={
     "id":"password",
@@ -9,7 +36,7 @@ id_and_password={
 }
 
 
-def check(id_entry, password_entry, text):
+def check(id_entry, password_entry, text, mySocket):
     id_value=id_entry.get()
     password_value=password_entry.get()
     text_value = text.get("1.0", tk.END)
@@ -19,6 +46,7 @@ def check(id_entry, password_entry, text):
     else:
         if  hashlib.sha256(password_value.encode()).hexdigest() == id_and_password[id_value] :
             print(text_value)
+            mySocket.send(text_value.encode())
         else:
             box.showinfo(message="아이디와 비밀번호가 일치하지 않습니다.", title="경고")
 
@@ -57,7 +85,7 @@ def create_page1(container):
     text=tk.Text(page1)
     text.pack()
 
-    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text))
+    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text, mySocket))
     button.pack()
 
     button1 = tk.Button(page1, text="회원가입", command=lambda: show_page(page2))

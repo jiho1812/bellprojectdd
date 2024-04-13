@@ -1,7 +1,7 @@
 import socket
 
 # 서버 주소와 포트
-SERVER_HOST = '127.0.0.1'
+SERVER_HOST = 'localhost'
 SERVER_PORT = 12345
 
 # 서버에 연결
