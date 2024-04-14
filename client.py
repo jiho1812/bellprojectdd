@@ -3,7 +3,7 @@ import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
 
-SERVER_HOST = 'localhost'
+SERVER_HOST = '192.168.219.102'
 SERVER_PORT = 12345
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
