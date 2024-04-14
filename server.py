@@ -3,8 +3,10 @@ import tkinter as tk
 import tkinter.messagebox as box
 import threading
 
-SERVER_HOST = 'localhost'  
+SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 12345
+
+print(socket.gethostbyname(socket.gethostname()))
 
 id_list=["00000","00000","00000","00000","00000","00000","00000",]
 text_list=["-----","-----","-----","-----","-----","-----","-----",]
