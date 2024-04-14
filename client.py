@@ -3,7 +3,7 @@ import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
 
-SERVER_HOST = '192.168.219.102'
+SERVER_HOST = '192.168.123.105'
 SERVER_PORT = 12345
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,7 +17,7 @@ id_and_password={
 
 }
 
-with open(r'C:\Coding\bellproject\databa\회원정보.txt', 'r') as file:
+with open(r'회원정보.txt', 'r') as file:
     # 파일의 각 줄에 대해서 반복
         for line in file:
             # 줄을 콜론(:)을 기준으로 분리하여 key와 value로 저장
@@ -60,7 +60,7 @@ def register_check(admin_password_entry,register_id_entry,register_password_entr
 
             box.showinfo(message="회원가입이 완료되었습니다.", title="알림")
 
-            output_file_path = r'C:\Coding\bellproject\databa\회원정보.txt'
+            output_file_path = r'회원정보.txt'
             with open(output_file_path, 'a', encoding='utf-8') as output_file:
                 output_file.write(f"{register_id_entry.get()}:{hashed_password}\n")
            
