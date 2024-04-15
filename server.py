@@ -2,6 +2,14 @@ import socket
 import tkinter as tk
 import tkinter.messagebox as box
 import threading
+import time
+import pygame
+
+pygame.init()
+pygame.mixer.music.load("992600335F7211DC01.mp3")
+
+
+
 
 SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 12345
@@ -10,6 +18,9 @@ print(socket.gethostbyname(socket.gethostname()))
 
 id_list=["00000","00000","00000","00000","00000","00000","00000",]
 text_list=["-----","-----","-----","-----","-----","-----","-----",]
+
+
+
 
 
 def update_gui():
@@ -36,10 +47,11 @@ def start_server():
         decoded_data=data.decode()
         number_id, message = decoded_data.split(':')
         del id_list[0]
-        del text_list[0]
+        del text_list[0]        
         id_list.append(number_id)
         text_list.append(message)
         update_gui()
+        pygame.mixer.music.play()
         
         
 def start_gui():

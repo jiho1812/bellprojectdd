@@ -3,7 +3,7 @@ import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
 
-SERVER_HOST = '192.168.123.105'
+SERVER_HOST = '10.137.199.27'
 SERVER_PORT = 12345
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,7 +17,7 @@ id_and_password={
 
 }
 
-with open(r'회원정보.txt', 'r') as file:
+with open(r'회원정보.txt', 'r', encoding='utf-8') as file:
     # 파일의 각 줄에 대해서 반복
         for line in file:
             # 줄을 콜론(:)을 기준으로 분리하여 key와 value로 저장
