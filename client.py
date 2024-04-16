@@ -2,8 +2,9 @@ import socket
 import tkinter as tk
 import tkinter.messagebox as box
 import hashlib
+import tkinter.ttk as ttk
 
-SERVER_HOST = '10.137.199.27'
+SERVER_HOST = '10.137.199.231'
 SERVER_PORT = 12345
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,7 +29,7 @@ with open(r'회원정보.txt', 'r', encoding='utf-8') as file:
 
 
 
-def check(id_entry, password_entry, text, client_socket):
+def check(id_entry, password_entry, text, client_socket, teacher_combobox):
     id_value=id_entry.get()
     password_value=password_entry.get()
     text_value = text.get()
@@ -38,7 +39,7 @@ def check(id_entry, password_entry, text, client_socket):
     else:
         if  hashlib.sha256(password_value.encode()).hexdigest() == id_and_password[id_value] :
             print(text_value)
-            text_id=f"{id_value}:{text_value}"
+            text_id=f"{id_value}:{text_value}:{teacher_combobox.get()}"
             client_socket.send(text_id.encode())
             box.showinfo(message="전송되었습니다.", title="알림")
             id_entry.delete(0, len(id_entry.get()))
@@ -50,10 +51,10 @@ def check(id_entry, password_entry, text, client_socket):
 
 
 def register_check(admin_password_entry,register_id_entry,register_password_entry):
-    admin_pw = "12345"
+    admin_pw = "cdf066c7d2fa9c14362483719974f1134e8429f13b1e71bf4c26bb28e3b511cd"
     password_value=register_password_entry.get()
     if register_id_entry.get() not in id_and_password:
-        if admin_pw ==  admin_password_entry.get():
+        if admin_pw ==  hashlib.sha256(admin_password_entry.get()).hexdigest():
             hashed_password = hashlib.sha256(password_value.encode()).hexdigest()
             id_and_password[register_id_entry.get()] = hashed_password
 
@@ -97,13 +98,20 @@ def create_page1(container):
     password_entry=tk.Entry(page1, show="*")
     password_entry.pack()
 
+    teacher_label=tk.Label(page1, text="어떤 선생님에게 질문을 드릴 건가요?")
+    teacher_label.pack()
+
+    teacher_combox=ttk.Combobox(page1,values=["이재선 선생님", "김수환 선생님", "손병만 선생님", "유병산 선생님", "김진영 선생님", "전선영 선생님", "오원진 선생님", "김기태 선생님", "박영선 선생님", "김영훈 선생님"], state="readonly")
+    teacher_combox.set("이재선 선생님")
+    teacher_combox.pack()
+
     text_label=tk.Label(page1, text="요구사항(한 줄로 입력해주세요.)")
     text_label.pack()
 
     text=tk.Entry(page1)
     text.pack()
 
-    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text, client_socket))
+    button=tk.Button(page1, text="전송", command=lambda: check(id_entry, password_entry, text, client_socket, teacher_combox))
     button.pack()
 
     button1 = tk.Button(page1, text="회원가입", command=lambda: show_page(page2))

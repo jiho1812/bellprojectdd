@@ -18,6 +18,7 @@ print(socket.gethostbyname(socket.gethostname()))
 
 id_list=["00000","00000","00000","00000","00000","00000","00000",]
 text_list=["-----","-----","-----","-----","-----","-----","-----",]
+teacher_list=["---","---","---","---","---","---","---"]
 
 
 
@@ -27,6 +28,7 @@ def update_gui():
     for i in range(7):
         id_list_label[i].config(text=id_list[i])
         text_list_label[i].config(text=text_list[i])
+        teacher_list_label[i].config(text=teacher_list[i])
         
 
 def start_server():
@@ -45,11 +47,13 @@ def start_server():
             break
         print(f"[*] Received: {data.decode()}")
         decoded_data=data.decode()
-        number_id, message = decoded_data.split(':')
+        number_id, message, teacher = decoded_data.split(':')
         del id_list[0]
-        del text_list[0]        
+        del text_list[0]   
+        del teacher_list[0]     
         id_list.append(number_id)
         text_list.append(message)
+        teacher_list.append(teacher)
         update_gui()
         pygame.mixer.music.play()
         
@@ -62,19 +66,25 @@ def start_gui():
     id_label=tk.Label(window, text="아이디", borderwidth=3, relief="groove", width=30, height=2, padx=10, bg="gray")
     id_label.grid(row=0, column=0, sticky="nsew")
 
-    text_label=tk.Label(window, text="내용", borderwidth=3, relief="groove", width=105, height=2, padx=10, bg="gray")
-    text_label.grid(row=0, column=1, sticky="nsew")
+    teacher_label=tk.Label(window, text="선생님",borderwidth=3, relief="groove", width=30, height=2, padx=10, bg="gray")
+    teacher_label.grid(row=0, column=1, sticky="nsew")
 
-    global id_list_label, text_list_label
+    text_label=tk.Label(window, text="내용", borderwidth=3, relief="groove", width=105, height=2, padx=10, bg="gray")
+    text_label.grid(row=0, column=2, sticky="nsew")
+
+    global id_list_label, text_list_label, teacher_list_label
 
     id_list_label = []
     text_list_label = []
+    teacher_list_label=[]
 
     for i in [0,1,2,3,4,5,6]:
         id_list_label.append(tk.Label(window, text=id_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10))
         id_list_label[i].grid(row=i+1, column=0, sticky="nsew")
+        teacher_list_label.append(tk.Label(window, text=teacher_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10))
+        teacher_list_label[i].grid(row=i+1, column=1, sticky="nsew")
         text_list_label.append(tk.Label(window, text=text_list[i], borderwidth=3, relief="groove", width=30, height=2, padx=10))
-        text_list_label[i].grid(row=i+1, column=1, sticky="nsew")
+        text_list_label[i].grid(row=i+1, column=2, sticky="nsew")
 
     window.mainloop()
 
