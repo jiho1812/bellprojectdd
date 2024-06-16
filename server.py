@@ -6,10 +6,7 @@ import time
 import pygame
 
 pygame.init()
-pygame.mixer.music.load("992600335F7211DC01.mp3")
-
-
-
+pygame.mixer.init()
 
 SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 12345
@@ -21,7 +18,10 @@ text_list=["-----","-----","-----","-----","-----","-----","-----",]
 teacher_list=["---","---","---","---","---","---","---"]
 
 
+teacher_sound={"이재선 선생님":1, "김수환 선생님":1, "손병만 선생님":1, "유병산 선생님":1, "김진영 선생님":1, "전선영 선생님":1, "오원진 선생님":1, "김기태 선생님":1, "박영선 선생님":1, "김영훈 선생님":1}
 
+def play_music(track):
+    pygame.mixer.music.load(teacher_sound[track])
 
 
 def update_gui():
@@ -55,7 +55,9 @@ def start_server():
         text_list.append(message)
         teacher_list.append(teacher)
         update_gui()
-        pygame.mixer.music.play()
+        play_music(teacher)
+
+        
         
         
 def start_gui():
